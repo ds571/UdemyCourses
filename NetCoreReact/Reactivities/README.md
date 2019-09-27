@@ -39,7 +39,7 @@ dotnet ef migrations add InitialCreate -p Persistence/ -s API/ // -s sets API to
 // To get help: dotnet ef database -h
 
 Drop database:
-dotnet ef drop database -p Persistence/ -s API/
+dotnet ef database drop -p Persistence/ -s API/
 
 ## Create React App
 npx create-react-app client-app --use-npm --typescript // use typescript  
