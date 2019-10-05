@@ -18,10 +18,9 @@ namespace Application.Activities
         {
             private readonly DataContext _context;
             // Receive http requests and send http responses
-            private readonly ILogger<List> _logger;
-            public Handler(DataContext context /*, ILogger<List> logger*/)
+
+            public Handler(DataContext context)
             {
-                //_logger = logger;
                 // Go out and get activities from database
                 _context = context;
             }

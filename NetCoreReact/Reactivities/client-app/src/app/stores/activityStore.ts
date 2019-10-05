@@ -27,20 +27,6 @@ class ActivityStore {
         }, {} as {[key: string]: IActivity[]}));
     };
 
-    //@action loadActivities = () => {
-    //    this.loadingInitial = true; // mutating state here (wouldn't work in redux)
-
-    //    agent.Activities.list()
-    //        .then(activities => {
-    //            activities.forEach((activity) => {
-    //                activity.date = activity.date.split('.')[0];
-    //                this.activities.push(activity);
-    //            });
-    //        })
-    //        .catch(error => console.log(error))
-    //        .finally(() => this.loadingInitial = false);
-    //};
-
     // same as above:
     @action loadActivities = async () => {
         this.loadingInitial = true;
@@ -53,7 +39,7 @@ class ActivityStore {
                 });
                 this.loadingInitial = false;
             });
-            console.log(this.groupActivitiesByDate(activities));
+            //console.log(this.groupActivitiesByDate(activities));
         } catch (error) {
             runInAction('load activities error', () => {
                 console.log(error);
