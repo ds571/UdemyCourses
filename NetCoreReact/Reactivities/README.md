@@ -46,3 +46,6 @@ dotnet ef database drop -p Persistence/ -s API/
 
 ## Add React Router
 cd into client-app and do: **npm install react-router-dom**
+
+## Add React-Final-Form
+npm install react-final-form final-form
