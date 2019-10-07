@@ -24,6 +24,7 @@ axios.interceptors.response.use(undefined, error => { // When response is fullfi
     {
         toast.error('Server error - check the terminal for more info!');
     }
+    throw error;
 });
 
 // store request in a constant
