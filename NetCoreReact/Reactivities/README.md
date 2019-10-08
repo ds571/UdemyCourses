@@ -49,3 +49,32 @@ cd into client-app and do: **npm install react-router-dom**
 
 ## Add React-Final-Form
 npm install react-final-form final-form
+
+## User Secrets  
+1) dotnet user-secrets // gives list of options we can use
+2) In API csproj: Add UserSecretsId
+```
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>86c2f9d7-e81c-4fcb-bb6b-01da04728824</UserSecretsId>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
+```
+3) In cmd: dotnet user-secrets set "TokenKey" "super secret key" -p API/
+
+### List secrets
+dotnet user-secrets list -p API/
