@@ -1,20 +1,20 @@
 import React, { useContext, useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
-import ActivityStore from '../../../app/stores/activityStore';
 import { observer } from 'mobx-react-lite';
 import { RouteComponentProps } from 'react-router';
 import ActivityDetailedHeader from './ActivityDetailedHeader';
 import ActivityDetailedInfo from './ActivityDetailedInfo';
 import ActivityDetailedChat from './ActivityDetailedChat';
 import ActivityDetailedSidebar from './ActivityDetailedSidebar';
+import { RootStoreContext } from '../../../app/stores/rootStore';
 
 interface DetailParams {
     id: string
 }
 
 const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match, history }) => {
-    const activityStore = useContext(ActivityStore);
-    const { activity, loadActivity } = activityStore;
+    const rootStore = useContext(RootStoreContext);
+    const { activity, loadActivity } = rootStore.activityStore;
 
     // do something when component mounts
     useEffect(() => {
