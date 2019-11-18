@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,20 +13,22 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<List<Activity>> { }
+        public class Query : IRequest<List<ActivityDto>> { }
 
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Handler : IRequestHandler<Query, List<ActivityDto>>
         {
             private readonly DataContext _context;
+            private readonly IMapper _mapper;
             // Receive http requests and send http responses
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IMapper mapper)
             {
                 // Go out and get activities from database
                 _context = context;
+                _mapper = mapper;
             }
 
-            public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 /*
                 try
@@ -44,9 +47,17 @@ namespace Application.Activities
                 }
                 */
                 // Get list of our activities and return them
-                var activities = await _context.Activities.ToListAsync();
+                // Eager loading
+                //var activities = await _context.Activities
+                //    .Include(x => x.UserActivities)
+                //    .ThenInclude(x => x.AppUser)
+                //    .ToListAsync();
 
-                return activities;
+                // Lazy loading
+                var activities = await _context.Activities
+                    .ToListAsync();
+
+                return _mapper.Map<List<Activity>, List<ActivityDto>>(activities);
             }
         }
     }
