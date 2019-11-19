@@ -9,7 +9,7 @@ import ActivityDetailedSidebar from './ActivityDetailedSidebar';
 import { RootStoreContext } from '../../../app/stores/rootStore';
 
 interface DetailParams {
-    id: string
+    id: string;
 }
 
 const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match, history }) => {
@@ -34,7 +34,7 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match, h
                 <ActivityDetailedChat />
             </Grid.Column>
             <Grid.Column width={6}>
-                <ActivityDetailedSidebar />
+                <ActivityDetailedSidebar attendees={activity.attendees} />
             </Grid.Column>
         </Grid>
     )
