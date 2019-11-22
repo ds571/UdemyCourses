@@ -27,6 +27,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using AutoMapper;
 using Infrastructure.Photos;
+using API.SignalR;
 
 namespace API
 {
@@ -52,7 +53,7 @@ namespace API
             {
                 opt.AddPolicy("CorsPolicy", policy => 
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
                 });
             });
 
@@ -60,6 +61,7 @@ namespace API
 
             services.AddMediatR(typeof(List.Handler).Assembly); // Just need to tell app about one handler as the assembly is the same for all handlers
             services.AddAutoMapper(typeof(List.Handler)); // assembly for mapping profile
+            services.AddSignalR();
             services.AddControllers(opt =>
             {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -93,6 +95,21 @@ namespace API
                         IssuerSigningKey = key,
                         ValidateAudience = false,
                         ValidateIssuer = false
+                    };
+
+                    // Do something with token when we receive it
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -129,6 +146,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }
