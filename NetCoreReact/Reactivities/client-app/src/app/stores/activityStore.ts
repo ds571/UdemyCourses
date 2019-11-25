@@ -1,4 +1,4 @@
-import { observable, action, computed, runInAction } from "mobx";
+import { observable, action, computed, runInAction, reaction } from "mobx";
 import { SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
@@ -12,10 +12,21 @@ import {
   LogLevel
 } from "@microsoft/signalr";
 
+const LIMIT = 2;
+
 export default class ActivityStore {
   rootStore: RootStore;
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
+
+    reaction( // if predicate keys have change, do this:
+      () => this.predicate.keys(),
+      () => {
+        this.page = 0;
+        this.activityRegistry.clear();
+        this.loadActivities();
+      }
+    );
   }
 
   @observable activityRegistry = new Map();
@@ -25,6 +36,38 @@ export default class ActivityStore {
   @observable target = "";
   @observable loading = false;
   @observable.ref hubConnection: HubConnection | null = null;
+  @observable activityCount = 0;
+  @observable page = 0;
+  @observable predicate = new Map();
+
+  @action setPredicate = (predicate: string, value: string | Date) => {
+    this.predicate.clear(); // If no predicate, just return all activities
+    if(predicate !== 'all') {
+      this.predicate.set(predicate, value);
+    }
+  };
+
+  @computed get axiosParams() {
+    const params = new URLSearchParams();
+    params.append('limit', String(LIMIT));
+    params.append('offset', `${this.page ? this.page * LIMIT : 0}`);
+    this.predicate.forEach((value, key) => {
+      if(key === 'startDate') {
+        params.append(key, value.toISOString());
+      } else {
+        params.append(key, value);
+      }
+    });
+    return params;
+  };
+
+  @computed get totalPages() {
+    return Math.ceil(this.activityCount / LIMIT);
+  };
+
+  @action setPage = (page: number) => {
+    this.page = page;
+  };
 
   @action createHubConnection = (activityId: string) => {
     this.hubConnection = new HubConnectionBuilder()
@@ -107,12 +150,14 @@ export default class ActivityStore {
     this.loadingInitial = true;
     const user = this.rootStore.userStore.user!; // no possiblity that this method is going to be called without user being present
     try {
-      const activities = await agent.Activities.list(); // block execution of anything  below this until this has been fulfilled
+      const activitiesEnvelope = await agent.Activities.list(this.axiosParams/*LIMIT, this.page*/); // block execution of anything  below this until this has been fulfilled
+      const {activities, activityCount} = activitiesEnvelope;
       runInAction("loading activities", () => {
         activities.forEach(activity => {
           setActivityProps(activity, user);
           this.activityRegistry.set(activity.id, activity); // mutating state here
         });
+        this.activityCount = activityCount;
         this.loadingInitial = false;
       });
     } catch (error) {
