@@ -40,6 +40,9 @@ dotnet ef migrations add InitialCreate -p Persistence/ -s API/ // -s sets API to
 // Apply Migration
 dotnet ef database update
 
+// Remove Last Migration
+dotnet ef migrations remove
+
 // Create database  
 // To get help: dotnet ef database -h
 
