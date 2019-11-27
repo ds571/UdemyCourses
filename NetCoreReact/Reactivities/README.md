@@ -33,13 +33,19 @@ dotnet add reference ../Domain/
 ## Run Application
 dotnet run -p API/
 
-## Add EF Migration
-dotnet ef migrations add InitialCreate -p Persistence/ -s API/ // -s sets API to startup project  
+## EF Core Commands
+```
+// Add Migration
+dotnet ef migrations add InitialCreate -p Persistence/ -s API/ // -s sets API to startup project
+// Apply Migration
+dotnet ef database update
+
 // Create database  
 // To get help: dotnet ef database -h
 
 Drop database:
 dotnet ef database drop -p Persistence/ -s API/
+```
 
 ## Create React App
 **npx create-react-app client-app --use-npm --typescript** // use typescript  
