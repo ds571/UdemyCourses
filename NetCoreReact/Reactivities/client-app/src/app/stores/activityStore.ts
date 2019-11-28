@@ -1,4 +1,4 @@
-import { observable, action, computed, runInAction, reaction } from "mobx";
+import { observable, action, computed, runInAction, reaction, toJS } from "mobx";
 import { SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
@@ -19,12 +19,15 @@ export default class ActivityStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
 
-    reaction( // if predicate keys have change, do this:
+    reaction(
+      // if predicate keys have change, do this:
       () => this.predicate.keys(),
       () => {
         this.page = 0;
-        this.activityRegistry.clear();
-        this.loadActivities();
+        runInAction(() => {
+          this.activityRegistry.clear();
+          this.loadActivities();
+        });
       }
     );
   }
@@ -41,37 +44,41 @@ export default class ActivityStore {
   @observable predicate = new Map();
 
   @action setPredicate = (predicate: string, value: string | Date) => {
-    this.predicate.clear(); // If no predicate, just return all activities
-    if(predicate !== 'all') {
-      this.predicate.set(predicate, value);
-    }
+    runInAction(() => {
+      this.predicate.clear(); // If no predicate, just return all activities
+      if (predicate !== "all") {
+        this.predicate.set(predicate, value);
+      }
+    });
   };
 
   @computed get axiosParams() {
     const params = new URLSearchParams();
-    params.append('limit', String(LIMIT));
-    params.append('offset', `${this.page ? this.page * LIMIT : 0}`);
+    params.append("limit", String(LIMIT));
+    params.append("offset", `${this.page ? this.page * LIMIT : 0}`);
     this.predicate.forEach((value, key) => {
-      if(key === 'startDate') {
+      if (key === "startDate") {
         params.append(key, value.toISOString());
       } else {
         params.append(key, value);
       }
     });
     return params;
-  };
+  }
 
   @computed get totalPages() {
     return Math.ceil(this.activityCount / LIMIT);
-  };
+  }
 
   @action setPage = (page: number) => {
-    this.page = page;
+    runInAction(() => {
+      this.page = page;
+    });
   };
 
   @action createHubConnection = (activityId: string) => {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5000/chat", {
+      .withUrl(process.env.REACT_APP_API_CHAT_URL!, {
         accessTokenFactory: () => this.rootStore.commonStore.token!
       })
       .configureLogging(LogLevel.Information)
@@ -79,11 +86,17 @@ export default class ActivityStore {
 
     this.hubConnection
       .start()
-      .then(() => console.log("Connection State:", this.hubConnection!.state))
+      .then(() => {
+        runInAction(() => {
+          console.log("Connection State:", this.hubConnection!.state);
+        });
+      })
       .then(() => {
         try {
-          console.log("Attempting to join group. activityId: ", activityId);
-          this.hubConnection!.invoke("AddToGroup", activityId); // needs to match api method name EXACTLY
+          runInAction(() => {
+            console.log("Attempting to join group. activityId: ", activityId);
+            this.hubConnection!.invoke("AddToGroup", activityId); // needs to match api method name EXACTLY
+          });
         } catch (error) {
           console.log("ERROR: ", error);
         }
@@ -105,7 +118,9 @@ export default class ActivityStore {
   @action stopHubConnection = () => {
     this.hubConnection!.invoke("RemoveFromGroup", this.activity!.id)
       .then(() => {
-        this.hubConnection!.stop();
+        runInAction(() => {
+          this.hubConnection!.stop();
+        });
       })
       .then(() => {
         runInAction(() => {
@@ -150,8 +165,10 @@ export default class ActivityStore {
     this.loadingInitial = true;
     const user = this.rootStore.userStore.user!; // no possiblity that this method is going to be called without user being present
     try {
-      const activitiesEnvelope = await agent.Activities.list(this.axiosParams/*LIMIT, this.page*/); // block execution of anything  below this until this has been fulfilled
-      const {activities, activityCount} = activitiesEnvelope;
+      const activitiesEnvelope = await agent.Activities.list(
+        this.axiosParams /*LIMIT, this.page*/
+      ); // block execution of anything  below this until this has been fulfilled
+      const { activities, activityCount } = activitiesEnvelope;
       runInAction("loading activities", () => {
         activities.forEach(activity => {
           setActivityProps(activity, user);
@@ -172,7 +189,7 @@ export default class ActivityStore {
     let activity = this.getActivity(id);
     if (activity) {
       this.activity = activity;
-      return activity;
+      return toJS(activity);
     } else {
       this.loadingInitial = true;
       try {
@@ -194,6 +211,7 @@ export default class ActivityStore {
   };
 
   @action clearActivity = () => {
+    console.log("CLEARING ACTIVITY");
     this.activity = null;
   };
 
@@ -234,6 +252,7 @@ export default class ActivityStore {
       await agent.Activities.update(activity);
       runInAction("editing activity", () => {
         this.activityRegistry.set(activity.id, activity);
+        this.activity = null;
         this.activity = activity;
         this.submitting = false;
       });

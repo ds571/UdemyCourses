@@ -7,6 +7,7 @@ import ActivityDetailedInfo from './ActivityDetailedInfo';
 import ActivityDetailedChat from './ActivityDetailedChat';
 import ActivityDetailedSidebar from './ActivityDetailedSidebar';
 import { RootStoreContext } from '../../../app/stores/rootStore';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 
 interface DetailParams {
     id: string;
@@ -14,12 +15,14 @@ interface DetailParams {
 
 const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match, history }) => {
     const rootStore = useContext(RootStoreContext);
-    const { activity, loadActivity } = rootStore.activityStore;
+    const { activity, loadActivity, loadingInitial } = rootStore.activityStore;
 
     // do something when component mounts
     useEffect(() => {
         loadActivity(match.params.id); // run once when mounting component, so pass array of dependencies
-    }, [loadActivity, match.params.id, history]);
+    }, [loadActivity, match.params.id, history ]);
+
+    if (loadingInitial) return <LoadingComponent content='Loading activity...' />;
 
     if(!activity)
     {

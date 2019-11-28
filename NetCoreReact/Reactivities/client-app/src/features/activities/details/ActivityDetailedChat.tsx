@@ -17,11 +17,13 @@ const ActivityDetailedChat = () => {
   } = rootStore.activityStore;
 
   useEffect(() => {
+    console.log("CREATING HUB CONNECTION");
     createHubConnection(activity!.id);
-    return () => { // This gets called when component unmounts (when navigate away)
-      stopHubConnection();
+    return () => {
+      // This gets called when component unmounts (when navigate away)
+        stopHubConnection();
     };
-  }, [createHubConnection, stopHubConnection, activity]);
+  }, [createHubConnection, stopHubConnection ]);
 
   return (
     <Fragment>

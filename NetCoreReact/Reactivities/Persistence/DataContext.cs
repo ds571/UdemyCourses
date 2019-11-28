@@ -13,7 +13,6 @@ namespace Persistence
         }
 
         public DbSet<Value> Values {get; set; }
-
         public DbSet<Activity> Activities { get; set; }
         public DbSet<UserActivity> UserActivities { get; set; } // Table will be UserActivities
         public DbSet<Photo> Photos { get; set; }

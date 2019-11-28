@@ -34,7 +34,7 @@ interface DetailParams {
 
 const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({ match, history }) => {
     const rootStore = useContext(RootStoreContext);
-    const { createActivity, editActivity, submitting, loadActivity } = rootStore.activityStore;
+    const { createActivity, editActivity, submitting, loadActivity, clearActivity } = rootStore.activityStore;
 
     const [activity, setActivity] = useState(new ActivityFormValues());
     const [loading, setLoading] = useState(false);

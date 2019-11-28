@@ -42,7 +42,9 @@ export class ActivityFormValues implements IActivityFormValues {
 
     constructor(init?: IActivityFormValues){
         if(init && init.date){
-            init.time = init.date;
+            //runInAction(() => {
+                init.time = init.date;
+            //});
         }
         Object.assign(this, init); // automatically maps
     }
