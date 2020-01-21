@@ -46,7 +46,7 @@ dotnet ef migrations remove
 // Create database  
 // To get help: dotnet ef database -h
 
-// Generate Migration Script
+// Generate Migration Script (cd into project that contains the Migrations folder)
 dotnet ef migrations script -o outputFileName
 
 Drop database:
