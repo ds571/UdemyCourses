@@ -46,7 +46,7 @@ dotnet ef migrations remove
 // Create database  
 // To get help: dotnet ef database -h
 
-// Generate Migration Script 
+// Generate Migration Script (FIRST create/add migration)
 dotnet ef migrations script -p Persistence/ -s API/ -o outputFileName
 
 Drop database:
