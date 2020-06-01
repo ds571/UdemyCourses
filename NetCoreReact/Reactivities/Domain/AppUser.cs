@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Domain
 {
     public class AppUser : IdentityUser
     {
+        public AppUser()
+        {
+            Photos = new Collection<Photo>();
+        }
         public string DisplayName { get; set; }
         public string Bio { get; set; }
         public virtual ICollection<UserActivity> UserActivities { get; set; }
