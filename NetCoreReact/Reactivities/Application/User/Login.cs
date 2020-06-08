@@ -17,7 +17,6 @@ namespace Application.User
 {
     public class Login
     {
-
         public class Query : IRequest<User> 
         { 
             public string Email { get; set; }
@@ -58,11 +57,17 @@ namespace Application.User
 
                 if(result.Succeeded)
                 {
+                    user.RefreshToken = _jwtGenerator.GenerateRefreshToken();
+                    user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(30);
+
+                    await _userManager.UpdateAsync(user);
+
                     // TODO: generate token
                     return new User
                     {
                         DisplayName = user.DisplayName,
                         token = _jwtGenerator.CreateToken(user),
+                        RefreshToken = user.RefreshToken,
                         Username = user.UserName,
                         Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
                     };

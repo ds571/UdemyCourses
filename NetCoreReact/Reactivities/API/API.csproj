@@ -20,4 +20,6 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties wwwroot_4static_4js_42_1c1e219f0_1chunk_1js_1map__JsonSchema="https://json.schemastore.org/sarif-external-property-file-2.1.0-rtm.3.json" /></VisualStudio></ProjectExtensions>
+
 </Project>
