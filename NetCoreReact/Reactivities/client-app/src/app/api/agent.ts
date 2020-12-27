@@ -66,10 +66,11 @@ axios.interceptors.response.use(undefined, error => {
 const responseBody = (response: AxiosResponse) => response.data;
 
 // Sleep function to mimic real-world response times
+/*
 const sleep = (ms: number) => (response: AxiosResponse) =>
   new Promise<AxiosResponse>(resolve =>
     setTimeout(() => resolve(response), ms)
-  );
+  );*/
 
 // create request object
 const requests = {
@@ -136,7 +137,12 @@ const User = {
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
         return res.data.token;
       })
-  }
+  },
+  verifyEmail: (token: string, email: string) : Promise<void> =>
+  requests.post(`/user/verifyEmail`, {token, email}),
+
+  resendVerifyEmailConfirm: (email: string) : Promise<void> =>
+  requests.get(`/user/resendEmailVerification?email=${email}`)
 };
 
 const Profiles = {
@@ -157,8 +163,5 @@ const Profiles = {
     requests.get(`/profiles/${username}/activities?predicate=${predicate}`)
 };
 
-export default {
-  Activities,
-  User,
-  Profiles
-};
+
+export default {Activities, User, Profiles};

@@ -23,7 +23,7 @@ const ActivityDetailedChat = () => {
       // This gets called when component unmounts (when navigate away)
         stopHubConnection();
     };
-  }, [createHubConnection, stopHubConnection ]);
+  }, [createHubConnection, stopHubConnection, activity ]);
 
   return (
     <Fragment>

@@ -27,6 +27,7 @@ using AutoMapper;
 using Infrastructure.Photos;
 using API.SignalR;
 using Application.Profiles;
+using Infrastructure.Email;
 
 namespace API
 {
@@ -62,7 +63,7 @@ namespace API
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseLazyLoadingProxies();
-                opt.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
+                //opt.UseMySql(Configuration.GetConnectionString("DefaultConnection")); // Bring back when .NET 5 compatible
             });
 
             ConfigureServices(services);
@@ -76,8 +77,8 @@ namespace API
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseLazyLoadingProxies();
-                opt.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
-                //opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                //opt.UseMySql(Configuration.GetConnectionString("DefaultConnection")); // Bring back when .NET 5 compatible
+                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
             // Add CORS
             services.AddCors(opt => 
@@ -106,10 +107,14 @@ namespace API
                 .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Create>());
 
             /****************** Configure aspnet Identity **************************************/
-            var builder = services.AddIdentityCore<AppUser>();
+            var builder = services.AddIdentityCore<AppUser>(options => 
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+            });
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
+            identityBuilder.AddDefaultTokenProviders(); // Need this for using email confirmation token
             /***********************************************************************************/
 
             services.AddAuthorization(opt =>
@@ -159,9 +164,12 @@ namespace API
             services.AddScoped<IProfileReader, ProfileReader>();
             services.AddScoped<IFacebookAccessor, FacebookAccessor>();
 
+            services.AddScoped<IEmailSender, EmailSender>();
+
             /************** CLOUDINARY CONFIGURATION *********************/
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
             services.Configure<FacebookAppSettings>(Configuration.GetSection("Authentication:Facebook"));
+            services.Configure<SendGridSettings>(Configuration.GetSection("SendGrid"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

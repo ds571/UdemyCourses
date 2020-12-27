@@ -19,6 +19,8 @@ import LoadingComponent from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
 import ProfilePage from "../../features/profiles/ProfilePage";
 import { PrivateRoute } from "./PrivateRoute";
+import RegisterSuccess from "../../features/user/RegisterSuccess";
+import VerifyEmail from "../../features/user/VerifyEmail";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
   const rootStore = useContext(RootStoreContext);
@@ -33,7 +35,8 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
     }
   }, [getUser, setAppLoaded, token]);
 
-  if (!appLoaded) {
+  
+  if(!appLoaded) {
     return <LoadingComponent content="Loading app..." />;
   }
 
@@ -58,6 +61,8 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                 />{" "}
                 {/*Add location.key so that when props change inside this return, creates a new instance of whatever component is loading here */}
                 <PrivateRoute path="/profile/:username" component={ProfilePage} />
+                <Route path='/user/registerSuccess' component={RegisterSuccess} />
+                <Route path='/user/verifyEmail' component={VerifyEmail} />
                 <Route component={NotFound} />
               </Switch>
             </Container>
