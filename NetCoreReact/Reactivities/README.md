@@ -54,7 +54,11 @@ dotnet ef database drop -p Persistence/ -s API/
 ```
 
 ## Create React App
-**npx create-react-app client-app --use-npm --typescript** // use typescript  
+**npx create-react-app client-app --use-npm --typescript** // use typescript
+```
+// Now it is:
+npx create-react-app client-app --template typescript
+```
 
 ## Add React Router
 cd into client-app and do: **npm install react-router-dom**
